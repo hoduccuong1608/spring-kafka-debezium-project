@@ -1,0 +1,16 @@
+{
+  "name": "sensor-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "admin",
+    "database.password": "password",
+    "database.dbname": "sensor_db",
+    "publication.name": "sensor_pub",
+    "slot.name": "debezium_slot",
+    "plugin.name": "pgoutput",
+    "table.include.list": "public.sensor_readings",
+    "topic.prefix": "sensor"
+  }
+}
