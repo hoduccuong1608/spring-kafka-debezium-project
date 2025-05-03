@@ -2,274 +2,60 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Real-time Sensor Monitoring</title>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-    <style>
-      canvas {
-        width: 100%;
-        height: 400px;
-      }
-      .chart-container {
-        margin: 20px 0;
-      }
-      .controls {
-        margin: 10px 0;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Production Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/babel-standalone@7.22.9/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
-    <h1>Real-time Sensor Monitoring</h1>
-    <div class="controls">
-      <button onclick="resetZoom()">Reset Zoom</button>
-    </div>
-    <div class="chart-container">
-      <h2>Temperature (°C)</h2>
-      <canvas id="tempChart"></canvas>
-    </div>
-    <div class="chart-container">
-      <h2>Humidity (%)</h2>
-      <canvas id="humidityChart"></canvas>
-    </div>
-
-    <script>
-      const tempCtx = document.getElementById("tempChart").getContext("2d");
-      const humidityCtx = document.getElementById("humidityChart").getContext("2d");
-
-      const tempChart = new Chart(tempCtx, {
-        type: "line",
-        data: {
-          datasets: [
-            { label: "Room A", data: [], borderColor: "red", fill: false, tension: 0.1 },
-            { label: "Room B", data: [], borderColor: "blue", fill: false, tension: 0.1 },
-            { label: "Room C", data: [], borderColor: "green", fill: false, tension: 0.1 },
-          ],
-        },
-        options: {
-          animation: {
-            duration: 500,
-          },
-          plugins: {
-            tooltip: {
-              mode: "nearest",
-              intersect: false,
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) {
-                    label += ": ";
-                  }
-                  label += context.parsed.y;
-                  return label;
-                },
-              },
-            },
-            zoom: {
-              zoom: {
-                wheel: {
-                  enabled: true,
-                },
-                pinch: {
-                  enabled: true,
-                },
-                mode: "x",
-              },
-              pan: {
-                enabled: true,
-                mode: "x",
-              },
-            },
-          },
-          scales: {
-            x: {
-              type: "time",
-              time: {
-                unit: "second",
-                tooltipFormat: "yyyy-MM-dd HH:mm:ss",
-                displayFormats: {
-                  second: "HH:mm:ss",
-                },
-              },
-              ticks: {
-                source: "data",
-                maxTicksLimit: 10,
-              },
-              min: null,
-              max: null,
-            },
-            y: {
-              beginAtZero: false,
-              min: 15,
-              max: 40,
-              title: {
-                display: true,
-                text: "Temperature (°C)",
-              },
-            },
-          },
-        },
-      });
-
-      const humidityChart = new Chart(humidityCtx, {
-        type: "line",
-        data: {
-          datasets: [
-            { label: "Room A", data: [], borderColor: "red", fill: false, tension: 0.1 },
-            { label: "Room B", data: [], borderColor: "blue", fill: false, tension: 0.1 },
-            { label: "Room C", data: [], borderColor: "green", fill: false, tension: 0.1 },
-          ],
-        },
-        options: {
-          animation: {
-            duration: 500,
-          },
-          plugins: {
-            tooltip: {
-              mode: "nearest",
-              intersect: false,
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) {
-                    label += ": ";
-                  }
-                  label += context.parsed.y;
-                  return label;
-                },
-              },
-            },
-            zoom: {
-              zoom: {
-                wheel: {
-                  enabled: true,
-                },
-                pinch: {
-                  enabled: true,
-                },
-                mode: "x",
-              },
-              pan: {
-                enabled: true,
-                mode: "x",
-              },
-            },
-          },
-          scales: {
-            x: {
-              type: "time",
-              time: {
-                unit: "second",
-                tooltipFormat: "yyyy-MM-dd HH:mm:ss",
-                displayFormats: {
-                  second: "HH:mm:ss",
-                },
-              },
-              ticks: {
-                source: "data",
-                maxTicksLimit: 10,
-              },
-              min: null,
-              max: null,
-            },
-            y: {
-              beginAtZero: false,
-              min: 20,
-              max: 90,
-              title: {
-                display: true,
-                text: "Humidity (%)",
-              },
-            },
-          },
-        },
-      });
-
-      const socket = new SockJS("http://localhost:8080/ws");
-      const stompClient = Stomp.over(socket);
-
-      stompClient.connect(
-        {},
-        function (frame) {
-          console.log("Connected to WebSocket: " + frame);
-          stompClient.subscribe("/topic/sensors", function (message) {
-            console.log("Received message:", message.body);
-            const reading = JSON.parse(message.body);
-            updateCharts(reading);
-          });
-        },
-        function (error) {
-          console.error("WebSocket connection error:", error);
-          setTimeout(() => {
-            console.log("Reconnecting to WebSocket...");
-            stompClient.connect({}, function (frame) {
-              console.log("Reconnected: " + frame);
-              stompClient.subscribe("/topic/sensors", function (message) {
-                console.log("Received message:", message.body);
-                const reading = JSON.parse(message.body);
-                updateCharts(reading);
-              });
-            });
-          }, 5000);
-        }
-      );
-
-      function updateCharts(reading) {
-        const locationIndex = { "Room A": 0, "Room B": 1, "Room C": 2 };
-        const idx = locationIndex[reading.location];
-        if (idx === undefined) {
-          console.warn("Unknown location:", reading.location);
-          return;
-        }
-
-        const timestamp = new Date(reading.timestamp).getTime();
-        const timeWindow = 10 * 60 * 1000; // 10 phút
-        const minTime = timestamp - timeWindow;
-
-        // Cập nhật nhiệt độ
-        tempChart.data.datasets[idx].data.push({
-          x: timestamp,
-          y: reading.temperature,
+    <div id="root"></div>
+    <script type="text/babel">
+      function Dashboard() {
+        const [metrics, setMetrics] = React.useState({
+          completed_quantity: 0,
+          error_count: 0,
+          workorder_progress: {},
         });
-        tempChart.data.datasets[idx].data = tempChart.data.datasets[idx].data.filter((point) => point.x >= minTime);
 
-        // Cập nhật độ ẩm
-        humidityChart.data.datasets[idx].data.push({
-          x: timestamp,
-          y: reading.humidity,
-        });
-        humidityChart.data.datasets[idx].data = humidityChart.data.datasets[idx].data.filter((point) => point.x >= minTime);
+        React.useEffect(() => {
+          const ws = new WebSocket("ws://localhost:8080/ws");
+          ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setMetrics(data);
+          };
+          ws.onclose = () => console.log("WebSocket closed");
+          return () => ws.close();
+        }, []);
 
-        // Cập nhật phạm vi trục x
-        const allTimestamps = [
-          ...tempChart.data.datasets.flatMap((dataset) => dataset.data.map((point) => point.x)),
-          ...humidityChart.data.datasets.flatMap((dataset) => dataset.data.map((point) => point.x)),
-        ];
-        if (allTimestamps.length > 0) {
-          const minTimestamp = Math.min(...allTimestamps);
-          const maxTimestamp = Math.max(...allTimestamps);
-          tempChart.options.scales.x.min = new Date(minTimestamp);
-          tempChart.options.scales.x.max = new Date(maxTimestamp);
-          humidityChart.options.scales.x.min = new Date(minTimestamp);
-          humidityChart.options.scales.x.max = new Date(maxTimestamp);
-        }
-
-        tempChart.update();
-        humidityChart.update();
+        return (
+          <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Production Dashboard</h1>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-blue-100 p-4 rounded">
+                <h2 className="text-lg font-semibold">Completed Quantity</h2>
+                <p className="text-2xl">{metrics.completed_quantity}</p>
+              </div>
+              <div className="bg-red-100 p-4 rounded">
+                <h2 className="text-lg font-semibold">Error Count</h2>
+                <p className="text-2xl">{metrics.error_count}</p>
+              </div>
+            </div>
+            <h2 className="text-xl font-semibold mt-6">Work Order Progress</h2>
+            <div className="mt-2">
+              {Object.entries(metrics.workorder_progress).map(([wo, qty]) => (
+                <div key={wo} className="bg-gray-100 p-2 rounded mb-2">
+                  <span className="font-medium">{wo}</span>: {qty} units
+                </div>
+              ))}
+            </div>
+          </div>
+        );
       }
 
-      function resetZoom() {
-        tempChart.resetZoom();
-        humidityChart.resetZoom();
-      }
-
-      window.onbeforeunload = function () {
-        stompClient.disconnect(() => {
-          console.log("Disconnected from WebSocket");
-        });
-      };
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<Dashboard />);
     </script>
   </body>
 </html>

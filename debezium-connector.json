@@ -1,0 +1,16 @@
+{
+  "name": "product-log-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "admin",
+    "database.password": "password",
+    "database.dbname": "factory_log",
+    "publication.name": "factory_pub",
+    "slot.name": "debezium_slot",
+    "plugin.name": "pgoutput",
+    "table.include.list": "public.product_log",
+    "topic.prefix": "dbz_"
+  }
+}
