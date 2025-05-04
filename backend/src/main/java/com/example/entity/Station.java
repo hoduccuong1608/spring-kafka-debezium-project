@@ -3,16 +3,22 @@ package com.example.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "station")
 @Data
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    private String name;
+    @Column(name = "station_name", nullable = false)
+    private String stationName;
 
     @Column(name = "line_id")
-    private Long lineId;
+    private Integer lineId;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -3,23 +3,31 @@ package com.example.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "equipment")
 @Data
 public class Equipment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "serial_number")
-    private String serialnumber;
+    @Column(name = "serial_number", nullable = false, unique = true)
+    private String serialNumber;
 
+    @Column(name = "type")
     private String type;
 
     @Column(name = "station_id")
-    private Long stationId;
+    private Integer stationId;
 
-    private String status; // ACTIVE, BROKEN, MAINTENANCE
+    @Column(name = "status")
+    private String status;
 
-    private Long downtime; // Thời gian ngừng hoạt động (phút)
+    @Column(name = "downtime")
+    private Long downtime;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

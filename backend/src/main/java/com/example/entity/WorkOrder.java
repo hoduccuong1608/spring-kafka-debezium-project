@@ -11,12 +11,15 @@ import java.time.LocalDateTime;
 public class WorkOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
+
+    @Column(name = "work_order_name", nullable = false, unique = true)
+    private String workOrderName;
 
     @Column(name = "product_id")
-    private Long productId;
+    private Integer productId;
 
-    @Column(name = "quantity_ordered")
+    @Column(name = "quantity_ordered", nullable = false)
     private Integer quantityOrdered;
 
     @Column(name = "start_date")
@@ -25,8 +28,12 @@ public class WorkOrder {
     @Column(name = "due_date")
     private LocalDateTime dueDate;
 
-    private String status; // PENDING, IN_PROGRESS, COMPLETED
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "factory_id")
-    private Long factoryId;
+    private Integer factoryId;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

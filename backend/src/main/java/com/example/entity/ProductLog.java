@@ -11,21 +11,44 @@ import java.time.LocalDateTime;
 public class ProductLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "serial_number")
+    @Column(name = "serial_number", length = 50)
     private String serialNumber;
 
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    private String productName;      // Tên sản phẩm
-    private String stationName;      // Tên trạm
-    private String lineName;         // Tên dây chuyền
-    private String factoryName;      // Tên nhà máy
-    private String equipmentSerial;  // Số serial thiết bị
-    private String workerName;       // Tên công nhân
-    private String shiftCode;        // Mã ca làm việc
-    private String errorCode;        // Mã lỗi
-    private String workOrderName;    // Tên lệnh sản xuất
-    private String status;           // Trạng thái
+    @Column(name = "product_name", length = 100)
+    private String productName;
+
+    @Column(name = "station_name", length = 100)
+    private String stationName;
+
+    @Column(name = "line_name", length = 100)
+    private String lineName;
+
+    @Column(name = "factory_name", length = 100)
+    private String factoryName;
+
+    @Column(name = "equipment_serial", length = 50)
+    private String equipmentSerial;
+
+    @Column(name = "worker_name", length = 100)
+    private String workerName;
+
+    @Column(name = "shift_code", length = 50)
+    private String shiftCode;
+
+    @Column(name = "error_code", length = 50)
+    private String errorCode;
+
+    @Column(name = "work_order_name", length = 50)
+    private String workOrderName;
+
+    @Column(name = "status", length = 50)
+    private String status;
+
+    private LocalDateTime createdAt;
 }

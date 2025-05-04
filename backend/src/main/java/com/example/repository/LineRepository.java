@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LineRepository extends JpaRepository<Line, Long> {
+    Line findByLineNameAndFactoryId(String lineName, Integer factoryId);
 }

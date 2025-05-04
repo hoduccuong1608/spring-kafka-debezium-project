@@ -5,21 +5,39 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "error_logs")
 @Data
-@Table(name = "error_log")
 public class ErrorLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "log_id")
+    private Long logId;
 
-    @Column(name = "product_log_id")
-    private Long productLogId;
+    @Column(name = "error_code", nullable = false, length = 50)
+    private String errorCode;
 
-    @Column(name = "error_type_id")
-    private Long errorTypeId;
+    @Column(name = "event_timestamp", nullable = false)
+    private LocalDateTime eventTimestamp;
 
-    @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    @Column(name = "product_name", length = 100)
+    private String productName;
 
-    private String note;
+    @Column(name = "station_name", length = 100)
+    private String stationName;
+
+    @Column(name = "equipment_serial", length = 50)
+    private String equipmentSerial;
+
+    @Column(name = "worker_name", length = 100)
+    private String workerName;
+
+    @Column(name = "shift_code", length = 50)
+    private String shiftCode;
+
+    @Column(name = "operation", nullable = false, length = 10)
+    private String operation;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
